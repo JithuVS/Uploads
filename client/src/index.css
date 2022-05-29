@@ -4,20 +4,9 @@
     box-sizing: border-box;
   }
   
-  body {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgb(236, 236, 238);
-    overflow: hidden;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-  }
-  
   .container {
     background-color: white;
-    padding: 1rem 3rem;
+    padding: 2rem 3rem;
     padding-bottom: 2rem;
     border-radius: 0.5rem;
     border-top: rgb(80, 98, 255) 0.5rem solid;
@@ -31,6 +20,8 @@
     display: flex;
     flex-direction: column;
     gap: 1.4rem;
+    border: solid 2px;
+    padding: 5%;
   }
   
   form div {
@@ -84,6 +75,34 @@
   .logout {
     position: absolute;
     right: 0px;
-    color: mediumspringgreen;
-    background-color: darkslateblue;
+    color: darkred;
+    background-color: transparent;
+    font-size: larger;
+    top: 1%;
+    font-weight: bolder;
+  }
+
+  .center {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+  }
+
+  .containerflex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .item {
+    width: 32%;
+    padding-bottom: 12%; /* Same as width, sets height */
+    margin-bottom: 2%; /* (100-32*3)/2 */
+    position: relative;
+    border-style: solid;
+  }
+
+  table td {
+    border-style: solid;
+    border-width: thin;
   }

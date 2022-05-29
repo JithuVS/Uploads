@@ -43,11 +43,9 @@ function Register() {
   };
 
   return (
-    <div className="container">
-      <h2>Register</h2>
+    <div className="container center">
       <form onSubmit={(e) => handleSubmit(e)}>
         <div>
-          <label htmlFor="email">Email</label>
           <input
             type="email"
             name="email"
@@ -58,7 +56,6 @@ function Register() {
           />
         </div>
         <div>
-          <label htmlFor="password">Password</label>
           <input
             type="password"
             name="password"
@@ -69,7 +66,7 @@ function Register() {
           />
         </div>
         <button type="submit">Register</button>
-        <span>
+        <span style={{textAlign:'end'}}>
           <Link to="/login">Login</Link>
         </span>
       </form>

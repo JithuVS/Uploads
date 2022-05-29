@@ -9,12 +9,14 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage });
 
-const { register, login, uploads } = require("../Controllers/authController");
+const { register, login, uploads, getDetails } = require("../Controllers/authController");
+const { checkUser } = require("../Middlewares/authMiddleware");
 const router = require("express").Router();
 
-router.post("/");
+router.post("/", checkUser);
 router.post("/register", register);
 router.post("/login", login);
 router.post("/upload", upload.single("fileName"), uploads);
+router.get("/get", getDetails);
 
 module.exports = router;

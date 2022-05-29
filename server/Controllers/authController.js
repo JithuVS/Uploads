@@ -1,13 +1,14 @@
 const User = require("../Models/userModel");
+const Assets = require("../Models/assetModel");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
-const fs = require('fs');
-const dotenv = require('dotenv');
+const fs = require("fs");
+const dotenv = require("dotenv");
 dotenv.config();
 
 const maxAge = 3 * 24 * 60 * 60;
 const createToken = (id) => {
-  return jwt.sign({ id }, "sreejith's secret key", {
+  return jwt.sign({ id }, process.env.secret_key, {
     expiresIn: maxAge,
   });
 };
@@ -71,12 +72,23 @@ module.exports.login = async (req, res) => {
   }
 };
 
-
 module.exports.uploads = async (req, res) => {
   try {
     var locaFilePath = req.file.path;
-    var result = await uploadToCloudinary(locaFilePath);
-    return res.status(200).json(result);
+    const token = req.cookies.jwt;
+    const data = req.body;
+    if (token) {
+      jwt.verify(token, process.env.secret_key, async (err, decodedToken) => {
+          user = await User.findById(decodedToken.id);
+          if (user) {
+            let owner = decodedToken.id;
+            var result = await uploadToCloudinary(locaFilePath, { ...data, owner });
+            return res.status(200).json(result);
+          }else{
+            res.json({ error:"user not found", status: false });
+          }
+      })
+    }
   } catch (err) {
     const errors = handleErrors(err);
     res.json({ errors, status: false });
@@ -86,24 +98,57 @@ module.exports.uploads = async (req, res) => {
 cloudinary.config({
   cloud_name: process.env.cloud_name,
   api_key: process.env.api_key,
-  api_secret: process.env.api_secret
+  api_secret: process.env.api_secret,
 });
 
-async function uploadToCloudinary(locaFilePath) {
-  
-  var mainFolderName = "main"
-  var filePathOnCloudinary = mainFolderName + "/" + locaFilePath
-
-  return cloudinary.uploader.upload(locaFilePath,{"public_id":filePathOnCloudinary})
-  .then((result) => {
-    fs.unlinkSync(locaFilePath)
-    
-    return {
-      message: "Success",
-      url:result.url
-    };
-  }).catch((error) => {
-    fs.unlinkSync(locaFilePath)
-    return {message: "Fail",};
-  });
+async function uploadToCloudinary(locaFilePath, data) {
+  var mainFolderName = "main";
+  var filePathOnCloudinary = mainFolderName + "/" + locaFilePath;
+  return cloudinary.uploader
+    .upload(locaFilePath, { public_id: filePathOnCloudinary })
+    .then(async (result) => {
+      fs.unlinkSync(locaFilePath);
+      const { company, name, language, note, owner } = data;
+      const { asset_id, resource_type, version, original_extension, url } =
+        result;
+      await Assets.create({
+        company,
+        owner,
+        asset_id,
+        name,
+        resource_type,
+        version,
+        url,
+        original_extension,
+        language,
+        note,
+      });
+      return {
+        message: "Success",
+        url: result.url,
+      };
+    })
+    .catch((error) => {
+      fs.unlinkSync(locaFilePath);
+      return { message: "Fail" };
+    });
 }
+
+module.exports.getDetails = async (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    if (token) {
+      jwt.verify(token, process.env.secret_key, async (err, decodedToken) => {
+          user = await User.findById(decodedToken.id);
+          let id = decodedToken.id;
+          if(user){
+            let result = await Assets.find({owner: id});
+            return res.status(200).json(result);
+          }
+      });
+    }   
+  } catch (err) {
+    const errors = handleErrors(err);
+    res.json({ errors, status: false });
+  }
+};

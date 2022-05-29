@@ -43,11 +43,9 @@ function Login() {
   };
 
   return (
-    <div className="container">
-      <h2>Login</h2>
+    <div className="container center">
       <form onSubmit={(e) => handleSubmit(e)}>
         <div>
-          <label htmlFor="email">Email</label>
           <input
             type="email"
             name="email"
@@ -58,7 +56,6 @@ function Login() {
           />
         </div>
         <div>
-          <label htmlFor="password">Password</label>
           <input
             type="password"
             name="password"
@@ -69,7 +66,7 @@ function Login() {
           />
         </div>
         <button type="submit">Login</button>
-        <span>
+        <span style={{textAlign:'end'}}>
           <Link to="/register">Register</Link>
         </span>
       </form>
